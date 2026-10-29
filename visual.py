@@ -1,9 +1,6 @@
+import sys
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import (
-    QMainWindow, QWidget, QLabel, QLineEdit, QSpinBox, QSlider,
-    QHBoxLayout, QVBoxLayout, QGridLayout
-)
-
+from PyQt5.QtWidgets import QMainWindow, QWidget, QLabel, QLineEdit, QSpinBox, QSlider, QGridLayout, QApplication
 from model import Model
 
 class MainWindow(QMainWindow):
@@ -67,43 +64,38 @@ class MainWindow(QMainWindow):
         text = self.lines[index].text().strip()
         try:
             value = int(text)
-        except ValueError:
+        except Exception:
             value = self.model.get_values()[index]
         self.model.set_value(index, value)
         current = self.model.get_values()[index]
-        self.lines[index].blockSignals(True)
         self.lines[index].setText(str(current))
-        self.lines[index].blockSignals(False)
 
     def on_spin_changed(self, index, value):
         self.model.set_value(index, value)
         current = self.model.get_values()[index]
         if self.spins[index].value() != current:
-            self.spins[index].blockSignals(True)
             self.spins[index].setValue(current)
-            self.spins[index].blockSignals(False)
 
     def on_slider_changed(self, index, value):
         self.model.set_value(index, value)
         current = self.model.get_values()[index]
         if self.sliders[index].value() != current:
-            self.sliders[index].blockSignals(True)
             self.sliders[index].setValue(current)
-            self.sliders[index].blockSignals(False)
 
     def update_from_model(self):
         self.update_count += 1
         values = self.model.get_values()
         print("Значения в UI изменены на: "+str(values)+" Изменение №" + str(self.update_count))
         for i in range(3):
-            self.lines[i].blockSignals(True)
-            self.spins[i].blockSignals(True)
-            self.sliders[i].blockSignals(True)
-
             self.lines[i].setText(str(values[i]))
             self.spins[i].setValue(values[i])
             self.sliders[i].setValue(values[i])
 
-            self.lines[i].blockSignals(False)
-            self.spins[i].blockSignals(False)
-            self.sliders[i].blockSignals(False)
+def main():
+    app = QApplication(sys.argv)
+    window = MainWindow()
+    window.show()
+    return app.exec_()
+
+if __name__ == "__main__":
+    sys.exit(main())
